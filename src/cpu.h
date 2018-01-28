@@ -45,6 +45,7 @@
 #define CPU_EXC_MEMMANAGE       4
 #define CPU_EXC_BUSFAULT        5
 #define CPU_EXC_USAGEFAULT      6
+#define CPU_PROGRAM_CHECKSUM    7
 #define CPU_EXC_SVCALL          11
 #define CPU_EXC_DEBUGMONITOR    12
 #define CPU_EXC_PENDSV          14

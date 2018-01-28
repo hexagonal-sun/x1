@@ -53,14 +53,20 @@ void cpu_irq_main(void);
 /*
  * Exception vector table.
  */
-static const void *cpu_vector_table[] __used __section(".vectors") = {
-    [0]                                     = &boot_stack[ARRAY_SIZE(boot_stack)],
-    [CPU_EXC_RESET]                         = boot_start,
-    [CPU_EXC_NMI ... CPU_EXC_USAGEFAULT]    = cpu_exc_main,
+
+#define CPU_VECT_0 (&boot_stack[ARRAY_SIZE(boot_stack)])
+#define CPU_VECT_1 boot_start
+#define CPU_VECT_2 cpu_exc_main
+void program_checksum(void);
+const void *cpu_vector_table[] __used __section(".vectors") = {
+    [0]                                     = CPU_VECT_0,
+    [CPU_EXC_RESET]                         = CPU_VECT_1,
+    [CPU_EXC_NMI ... CPU_EXC_USAGEFAULT]    = CPU_VECT_2,
     [CPU_EXC_SVCALL]                        = cpu_exc_svcall,
     [CPU_EXC_DEBUGMONITOR]                  = cpu_exc_main,
     [CPU_EXC_PENDSV]                        = cpu_exc_pendsv,
     [CPU_EXC_SYSTICK]                       = cpu_exc_main,
+    [CPU_PROGRAM_CHECKSUM]                  = program_checksum,
     [CPU_EXC_IRQ_BASE ... CPU_EXC_IRQ_MAX]  = cpu_irq_main,
 };
 
