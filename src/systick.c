@@ -30,6 +30,7 @@
 
 #define SYSTICK_CSR_ENABLE  0x1
 #define SYSTICK_CSR_TICKINT 0x2
+#define SYSTICK_CSR_CLKSOURCE 0x4
 
 #define SYSTICK_CALIB_NOREF         0x80000000
 #define SYSTICK_CALIB_SKEW          0x40000000
@@ -69,5 +70,5 @@ systick_setup(void)
     counter = (tenms * 100) / THREAD_SCHED_FREQ;
     systick_regs->rvr = counter;
     systick_regs->cvr = 0;
-    systick_regs->csr = (SYSTICK_CSR_TICKINT | SYSTICK_CSR_ENABLE);
+    systick_regs->csr = (SYSTICK_CSR_CLKSOURCE | SYSTICK_CSR_TICKINT | SYSTICK_CSR_ENABLE);
 }
