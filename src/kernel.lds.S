@@ -29,8 +29,9 @@ ENTRY(boot_start)
  */
 MEMORY
 {
-    FLASH : ORIGIN = 0x0,        LENGTH = 0x100000
-    RAM   : ORIGIN = 0x20000000, LENGTH = 0x20000
+    FLASH : ORIGIN = 0x0,        LENGTH = 512k
+    RAM1  : ORIGIN = 0x10000000, LENGTH = 32k
+    RAM2  : ORIGIN = 0x2007C000, LENGTH = 32k
 }
 
 /*
@@ -100,13 +101,17 @@ SECTIONS
         _data_start = .;
         *(.data*)
         _data_end = .;
-    } > RAM AT > FLASH : data
+    } > RAM1 AT > FLASH : data
 
     .bss : {
         _bss_start = .;
         *(.bss)
         _bss_end = .;
-    } > RAM AT > FLASH : data
+    } > RAM1 AT > FLASH : data
+
+    .heap (NOLOAD) : {
+        *(.heap)
+    } > RAM2
 
     /*
      * The .eh_frame section is used by DWARF tools to unwind the stack,
@@ -119,3 +124,5 @@ SECTIONS
         *(.ARM*)
     }
 }
+
+program_checksum = -((boot_stack + 512) + boot_start + cpu_exc_main + cpu_exc_main + cpu_exc_main + cpu_exc_main + 6);

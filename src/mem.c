@@ -144,7 +144,7 @@
  * the heap data, or any other statically allocated uninitialized data, in
  * the kernel image file.
  */
-#define MEM_HEAP_SIZE       (64 * 1024)
+#define MEM_HEAP_SIZE       (32 * 1024)
 
 /*
  * Alignment required on addresses returned by mem_alloc().
@@ -243,7 +243,7 @@ struct mem_free_list {
  * The heap must be correctly aligned, so that the first block is
  * correctly aligned.
  */
-static char mem_heap[MEM_HEAP_SIZE] __aligned(MEM_ALIGN);
+static char mem_heap[MEM_HEAP_SIZE] __aligned(MEM_ALIGN) __section(".heap");
 
 /*
  * The unique free list.
