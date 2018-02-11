@@ -234,6 +234,30 @@ typedef struct
     uint32_t ISAR[5];
 } lpc_core_scb_t;
 
+typedef struct
+{
+    uint32_t tx_rx_dll;
+    uint32_t ier_dlm;
+    uint32_t iir_fcr;
+    uint32_t lcr;
+    uint32_t __reserved_1;
+    uint32_t lsr;
+    uint32_t __reserved_2;
+    uint32_t scr;
+    uint32_t acr;
+    uint32_t icr;
+    uint32_t fdr;
+    uint32_t __reserved_3;
+    uint32_t ter;
+}lpc_periph_uart_t;
+
+#define UART_DLAB_SHIFT 7
+#define UART_DIVADDVAL_SHIFT 0
+#define UART_MULVAL_SHIFT 4
+#define UART_FIFO_EN_SHIFT 0
+#define UART_THRE_MASK (1 << 5)
+#define UART_RDR_MASK 1
+
 #define ICSR_PENDSVSET_MASK (1 << 28)
 #define SCR_SLEEPONEXIT_MASK (1 << 1)
 
@@ -246,3 +270,4 @@ static volatile lpc_periph_timer_t  * const LPC_TIM2   = (lpc_periph_timer_t *)0
 static volatile lpc_periph_timer_t  * const LPC_TIM3   = (lpc_periph_timer_t *)0x40094000;
 static volatile lpc_core_nvic_t     * const LPC_NVIC   = (lpc_core_nvic_t *)0xE000E100;
 static volatile lpc_core_scb_t      * const LPC_SCB    = (lpc_core_scb_t  *)0xE000ED00;
+static volatile lpc_periph_uart_t   * const LPC_UART0  = (lpc_periph_uart_t *)0x4000C000;
