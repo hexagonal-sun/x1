@@ -189,7 +189,8 @@ SOURCES = \
 	src/systick.c \
 	src/thread.c \
 	src/timer.c \
-	src/uart.c
+	src/uart.c \
+	src/net/protocol.c
 
 SOURCES += \
 	lib/cbuf.c \

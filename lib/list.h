@@ -53,6 +53,7 @@ struct list {
  * Static list initializer.
  */
 #define LIST_INITIALIZER(list) { &(list), &(list) }
+#define LIST(l) struct list l = LIST_INITIALIZER(l);
 
 /*
  * Initialize a list.

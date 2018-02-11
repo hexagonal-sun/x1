@@ -34,6 +34,7 @@
 #include "thread.h"
 #include "timer.h"
 #include "uart.h"
+#include "net/protocol.h"
 
 /*
  * This function is the main entry point for C code. It's called from
@@ -52,6 +53,7 @@ main(void)
     timer_setup();
     shell_setup();
     sw_setup();
+    protocol_setup();
 
     printf("X1 " QUOTE(VERSION) "\n\n");
 
