@@ -193,7 +193,8 @@ SOURCES = \
 	src/net/protocol.c \
 	src/net/emac.c \
 	src/net/ethernet.c \
-	src/net/arp.c
+	src/net/arp.c \
+	src/net/ipv4.c
 
 SOURCES += \
 	lib/cbuf.c \
