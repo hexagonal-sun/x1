@@ -196,7 +196,8 @@ SOURCES = \
 SOURCES += \
 	lib/cbuf.c \
 	lib/fmt.c \
-	lib/shell.c
+	lib/shell.c \
+	lib/byteswap.c
 
 OBJECTS = $(patsubst %.S,%.o,$(patsubst %.c,%.o,$(SOURCES)))
 
