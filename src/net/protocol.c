@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "arp.h"
 #include "protocol.h"
 #include "emac.h"
 #include "ethernet.h"
@@ -247,6 +248,7 @@ void protocol_setup(void)
     condvar_init(&pkt_q_condvar);
     ethernet_init();
     emac_init();
+    arp_init();
 
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,

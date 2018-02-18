@@ -192,7 +192,8 @@ SOURCES = \
 	src/uart.c \
 	src/net/protocol.c \
 	src/net/emac.c \
-	src/net/ethernet.c
+	src/net/ethernet.c \
+	src/net/arp.c
 
 SOURCES += \
 	lib/cbuf.c \
