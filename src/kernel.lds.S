@@ -55,6 +55,12 @@ PHDRS
     vectors PT_LOAD FLAGS(5);
     text    PT_LOAD FLAGS(5);
     data    PT_LOAD FLAGS(6);
+
+    /*
+     * XXX Currently required to avoid warning, probably because of
+     * different alignments of .data and .bss.
+     */
+    bss     PT_LOAD FLAGS(6);
 }
 
 /*
@@ -107,7 +113,7 @@ SECTIONS
         _bss_start = .;
         *(.bss)
         _bss_end = .;
-    } > RAM1 AT > FLASH : data
+    } > RAM1 AT > FLASH : bss
 
     .heap (NOLOAD) : {
         *(.heap)
