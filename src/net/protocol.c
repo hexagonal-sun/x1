@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "protocol.h"
+#include "emac.h"
 
 static LIST(protocol_head);
 static LIST(pkt_q);
@@ -243,6 +244,7 @@ void protocol_setup(void)
 {
     mutex_init(&pkt_q_mutex);
     condvar_init(&pkt_q_condvar);
+    emac_init();
 
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,
