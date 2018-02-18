@@ -191,7 +191,8 @@ SOURCES = \
 	src/timer.c \
 	src/uart.c \
 	src/net/protocol.c \
-	src/net/emac.c
+	src/net/emac.c \
+	src/net/ethernet.c
 
 SOURCES += \
 	lib/cbuf.c \
