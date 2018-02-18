@@ -12,6 +12,7 @@
 #include "emac.h"
 #include "ethernet.h"
 #include "ipv4.h"
+#include "udp.h"
 
 static LIST(protocol_head);
 static LIST(pkt_q);
@@ -251,7 +252,7 @@ void protocol_setup(void)
     emac_init();
     arp_init();
     ipv4_init();
-
+    udp_init();
 
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,

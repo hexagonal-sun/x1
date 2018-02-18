@@ -194,7 +194,8 @@ SOURCES = \
 	src/net/emac.c \
 	src/net/ethernet.c \
 	src/net/arp.c \
-	src/net/ipv4.c
+	src/net/ipv4.c \
+	src/net/udp.c
 
 SOURCES += \
 	lib/cbuf.c \

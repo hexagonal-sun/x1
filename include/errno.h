@@ -29,5 +29,6 @@
 #define ENOENT      4
 #define EBUSY       5
 #define EEXIST      6
+#define EINUSE      7
 
 #endif /* _ERRNO_H */
