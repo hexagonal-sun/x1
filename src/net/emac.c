@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "constants.h"
+#include "packet.h"
 #include "protocol.h"
 #include "emac.h"
 
@@ -70,7 +71,7 @@ static void emac_irq(void *arg __unused)
 
         /* Do we have a full frame? */
         if (rx_status[desc_idx].status_info & (1 << 30))
-            packet_inject_rx(&fragment_cbuf);
+            protocol_inject_rx(&fragment_cbuf);
 
         desc_idx += 1;
         desc_idx %= DESC_LEN;

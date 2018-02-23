@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "ethernet.h"
+#include "packet.h"
 #include "protocol.h"
 #include "emac.h"
 

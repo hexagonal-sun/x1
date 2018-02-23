@@ -8,6 +8,7 @@
 
 #include "arp.h"
 #include "emac.h"
+#include "packet.h"
 #include "protocol.h"
 
 #define ARP_TIMEOUT 250
@@ -95,7 +96,7 @@ const uint8_t *resolve_address(uint32_t ip_address)
     mutex_lock(&arp_mutex);
     list_insert_head(&arp_pending_requests, &arp_p_req.node);
 
-    packet_inject_tx(pkt, ETHERNET);
+    protocol_inject_tx(pkt, ETHERNET);
 
     while (!arp_p_req.finished)
         condvar_wait(&arp_condvar,
@@ -155,7 +156,7 @@ static void arp_rx_packet(struct packet_t *pkt)
         packet_push_header(resp_packet, &resp, sizeof(resp));
         ethernet_mac_copy(resp_packet->tx_data.ethernet.dhost, packet->SHA);
         resp_packet->tx_data.ethernet.ether_type = ETHERTYPE_ARP;
-        packet_inject_tx(resp_packet, ETHERNET);
+        protocol_inject_tx(resp_packet, ETHERNET);
         break;
     }
     case OPER_REPLY:

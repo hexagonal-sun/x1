@@ -4,6 +4,7 @@
 
 #include "arp.h"
 #include "ipv4.h"
+#include "packet.h"
 #include "protocol.h"
 #include "ethernet.h"
 
@@ -44,6 +45,7 @@ static void ipv4_rx_packet(struct packet_t *pkt)
     header_len = header->ihl * 4;
     pkt->cur_data += header_len;
     pkt->cur_data_length -= header_len;
+    pkt->rx_data.ipv4_payload_len = header->tot_length - header_len;
 
     /* Drop packet if ttl is zero. */
     if (!header->ttl) {

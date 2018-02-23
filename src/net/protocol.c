@@ -8,11 +8,13 @@
 #include <stdbool.h>
 
 #include "arp.h"
+#include "packet.h"
 #include "protocol.h"
 #include "emac.h"
 #include "ethernet.h"
 #include "ipv4.h"
 #include "udp.h"
+#include "tcp.h"
 
 static LIST(protocol_head);
 static LIST(pkt_q);
@@ -34,69 +36,9 @@ static unsigned int rx_frame_prod_idx;
 static unsigned int rx_frame_cons_idx;
 static struct frame rx_frames[RX_PACKET_BUF_SIZE];
 
+
 #define NO_PROTO_WORKERS 3
 
-struct packet_t *packet_empty()
-{
-    struct packet_t *ret = mem_alloc(sizeof(*ret));
-
-    if (!ret)
-        return NULL;
-
-    ret->data = ret->cur_data = NULL;
-    ret->data_length = ret->cur_data_length = 0;
-
-    return ret;
-}
-
-struct packet_t *packet_create(void *frame, size_t frame_len)
-{
-    if (!frame || !frame_len)
-        return NULL;
-
-    struct packet_t *ret = packet_empty();
-
-    if (!ret)
-        return NULL;
-
-    ret->data = ret->cur_data = mem_alloc(frame_len);
-
-    if (!ret->data) {
-        mem_free(ret);
-        return NULL;
-    }
-
-    memcpy(ret->data, frame, frame_len);
-    ret->data_length = ret->cur_data_length = frame_len;
-
-    return ret;
-}
-
-void packet_push_header(struct packet_t *pkt, void *header, size_t header_len)
-{
-    size_t new_data_sz = pkt->data_length + header_len;
-    void *old_buf = pkt->data;
-    void *new_buf = mem_alloc(new_data_sz);
-
-    if (pkt->data)
-        memcpy(new_buf + header_len, pkt->data, pkt->data_length);
-
-    memcpy(new_buf, header, header_len);
-
-    pkt->cur_data = pkt->data = new_buf;
-    pkt->cur_data_length = pkt->data_length = new_data_sz;
-
-    if (old_buf)
-        mem_free(old_buf);
-}
-
-void packet_destroy(struct packet_t *pkt)
-{
-    if (pkt->data)
-        mem_free(pkt->data);
-
-    mem_free(pkt);
-}
 
 static bool is_rx_buf_full(void)
 {
@@ -111,7 +53,7 @@ static bool rx_buf_empty(void)
     return rx_frame_prod_idx == rx_frame_cons_idx;
 }
 
-void packet_inject_rx(struct cbuf *cbuf)
+void protocol_inject_rx(struct cbuf *cbuf)
 {
     struct frame *f;
     size_t frame_sz = cbuf_size(cbuf);
@@ -139,7 +81,7 @@ void packet_inject_rx(struct cbuf *cbuf)
     thread_wakeup(pkt_waiter);
 }
 
-void packet_inject_tx(struct packet_t *pkt, enum protocol_type type)
+void protocol_inject_tx(struct packet_t *pkt, enum protocol_type type)
 {
     pkt->dir = TX;
     pkt->handler = type;

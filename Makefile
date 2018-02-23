@@ -191,6 +191,7 @@ SOURCES = \
 	src/timer.c \
 	src/uart.c \
 	src/net/protocol.c \
+	src/net/packet.c \
 	src/net/emac.c \
 	src/net/ethernet.c \
 	src/net/arp.c \

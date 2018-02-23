@@ -6,6 +6,7 @@
 #include <src/condvar.h>
 
 #include "ipv4.h"
+#include "packet.h"
 #include "protocol.h"
 #include "udp.h"
 
@@ -115,7 +116,7 @@ void udp_xmit_packet(uint16_t dst_port, uint32_t dst_ip, void *payload,
     pkt->tx_data.ipv4.dst_ip = dst_ip;
     pkt->tx_data.ipv4.protocol = IP_PROTO_UDP;
 
-    packet_inject_tx(pkt, IPV4);
+    protocol_inject_tx(pkt, IPV4);
 }
 
 static struct protocol_t udp_procotol = {
