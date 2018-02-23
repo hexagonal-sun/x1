@@ -198,8 +198,8 @@ void protocol_setup(void)
 
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,
-                      "Protocol worker thread", 1024, 0);
+                      "Protocol worker thread", 1024, THREAD_MIN_PRIORITY);
 
     thread_create(NULL, protocol_gatherer_task, NULL,
-                  "Protocol Gatherer Task", 1024, 0);
+                  "Protocol Gatherer Task", 1024, THREAD_MIN_PRIORITY);
 }
