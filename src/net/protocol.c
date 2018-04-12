@@ -195,6 +195,7 @@ void protocol_setup(void)
     arp_init();
     ipv4_init();
     udp_init();
+    tcp_init();
 
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,

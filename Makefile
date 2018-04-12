@@ -196,7 +196,8 @@ SOURCES = \
 	src/net/ethernet.c \
 	src/net/arp.c \
 	src/net/ipv4.c \
-	src/net/udp.c
+	src/net/udp.c \
+	src/net/tcp.c
 
 SOURCES += \
 	lib/cbuf.c \
