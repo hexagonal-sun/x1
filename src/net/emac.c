@@ -119,6 +119,17 @@ static void emac_tx_frame(struct packet_t *pkt)
 
     desc_idx = LPC_EMAC->TxProduceIndex;
 
+    /* It has been observed that the hardware will not xmit a packet
+     * with an odd number of fragments when this wraps around
+     * DESC_LEN.
+     *
+     * To mitigate this, pad all pkts with that have an odd number of
+     * fragments with a useless fragment at the end. */
+    if (pkt->tx.header_ptr % 2) {
+        char buf = 0;
+        packet_tx_push_header_end(pkt, &buf, 1);
+    }
+
     i = pkt->tx.header_ptr;
 
     while (i--) {
