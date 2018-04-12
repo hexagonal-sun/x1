@@ -61,15 +61,15 @@ int udp_rx(uint16_t port, void *dst_buf, uint16_t dst_buf_sz)
 static void udp_rx_packet(struct packet_t *pkt)
 {
     udp_listener *i;
-    udp_header *header = (udp_header *)pkt->cur_data;
+    udp_header *header = (udp_header *)pkt->rx.cur_data;
     uint8_t *udp_payload;
     size_t udp_payload_sz;
 
-    pkt->cur_data += sizeof(*header);
-    pkt->cur_data_length -= sizeof(*header);
+    pkt->rx.cur_data += sizeof(*header);
+    pkt->rx.cur_data_length -= sizeof(*header);
 
-    udp_payload = pkt->cur_data;
-    udp_payload_sz = pkt->cur_data_length;
+    udp_payload = pkt->rx.cur_data;
+    udp_payload_sz = pkt->rx.cur_data_length;
 
     udp_swap_endian(header);
 
@@ -100,8 +100,13 @@ static void udp_rx_packet(struct packet_t *pkt)
 void udp_xmit_packet(uint16_t dst_port, uint32_t dst_ip, void *payload,
                      int payload_len)
 {
-    struct packet_t *pkt = packet_create(payload, payload_len);
+    struct packet_t *pkt = packet_tx_create();
     udp_header header;
+
+    if (!pkt)
+        return;
+
+    packet_tx_push_header(pkt, payload, payload_len);
 
     memset(&header, 0, sizeof(header));
 
@@ -112,9 +117,9 @@ void udp_xmit_packet(uint16_t dst_port, uint32_t dst_ip, void *payload,
 
     udp_swap_endian(&header);
 
-    packet_push_header(pkt, &header, sizeof(header));
-    pkt->tx_data.ipv4.dst_ip = dst_ip;
-    pkt->tx_data.ipv4.protocol = IP_PROTO_UDP;
+    packet_tx_push_header(pkt, &header, sizeof(header));
+    pkt->tx.meta.ipv4.dst_ip = dst_ip;
+    pkt->tx.meta.ipv4.protocol = IP_PROTO_UDP;
 
     protocol_inject_tx(pkt, IPV4);
 }

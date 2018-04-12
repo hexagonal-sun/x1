@@ -109,24 +109,30 @@ static void send_dummy_frames(void)
 
 static void emac_tx_frame(struct packet_t *pkt)
 {
-    int desc_idx;
+    size_t desc_idx, i;
 
     assert(pkt->handler == EMAC);
     assert(pkt->dir == TX);
-
-    /* Each fragment can only be 1024 bytes in length. */
-    assert(pkt->data_length < 1024);
+    assert(pkt->tx.header_ptr < DESC_LEN);
 
     mutex_lock(&emac_mutex);
 
-    /* Set the descriptor for the header. */
     desc_idx = LPC_EMAC->TxProduceIndex;
-    tx_desc[desc_idx].packet = pkt->data;
-    tx_desc[desc_idx].control = pkt->data_length - 1;
-    tx_desc[desc_idx].control |= (1 << 30); /* set the LAST bit. */
+
+    i = pkt->tx.header_ptr;
+
+    while (i--) {
+        tx_desc[desc_idx].packet = pkt->tx.headers[i].data;
+        tx_desc[desc_idx].control = pkt->tx.headers[i].size - 1;
+
+        if (i == 0)
+            tx_desc[desc_idx].control |= (1 << 30); /* set the LAST bit. */
+
+        desc_idx = (desc_idx + 1) % (DESC_LEN);
+    }
 
     /* Increment the TX produce index. */
-    LPC_EMAC->TxProduceIndex = (desc_idx + 1) % DESC_LEN;
+    LPC_EMAC->TxProduceIndex = desc_idx;
 
     /* Wait for xmit to complete. */
     while (LPC_EMAC->TxProduceIndex != LPC_EMAC->TxConsumeIndex) {};

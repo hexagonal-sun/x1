@@ -65,7 +65,7 @@ const uint8_t *resolve_address(uint32_t ip_address)
      * We couldn't find an entry in the ARP table.  We need to send
      * out ARP packet to resolve address.
      */
-    struct packet_t *pkt = packet_empty();
+    struct packet_t *pkt = packet_tx_create();
     const uint8_t *our_mac_address = emac_get_mac_address();
     arp_packet arp_request;
 
@@ -87,11 +87,11 @@ const uint8_t *resolve_address(uint32_t ip_address)
 
     arp_swap_endian(&arp_request);
 
-    packet_push_header(pkt, &arp_request, sizeof(arp_request));
+    packet_tx_push_header(pkt, &arp_request, sizeof(arp_request));
 
-    ethernet_mac_copy(pkt->tx_data.ethernet.dhost, broadcast_addr);
+    ethernet_mac_copy(pkt->tx.meta.ethernet.dhost, broadcast_addr);
 
-    pkt->tx_data.ethernet.ether_type = ETHERTYPE_ARP;
+    pkt->tx.meta.ethernet.ether_type = ETHERTYPE_ARP;
 
     mutex_lock(&arp_mutex);
     list_insert_head(&arp_pending_requests, &arp_p_req.node);
@@ -114,7 +114,7 @@ const uint8_t *resolve_address(uint32_t ip_address)
 
 static void arp_rx_packet(struct packet_t *pkt)
 {
-    arp_packet *packet = (arp_packet *)pkt->cur_data;
+    arp_packet *packet = (arp_packet *)pkt->rx.cur_data;
     const uint8_t *our_mac_address = emac_get_mac_address();
 
     /* This function will process any arp packets; they're not passed
@@ -132,11 +132,10 @@ static void arp_rx_packet(struct packet_t *pkt)
     {
     case OPER_REQUEST:
     {
-        struct packet_t *resp_packet = packet_empty();
+        struct packet_t *resp_packet = packet_tx_create();
         arp_packet resp;
 
         memset(&resp, 0, sizeof(resp));
-
 
         if (packet->TPA != OUR_IP_ADDRESS)
             return;
@@ -153,9 +152,9 @@ static void arp_rx_packet(struct packet_t *pkt)
 
         arp_swap_endian(&resp);
 
-        packet_push_header(resp_packet, &resp, sizeof(resp));
-        ethernet_mac_copy(resp_packet->tx_data.ethernet.dhost, packet->SHA);
-        resp_packet->tx_data.ethernet.ether_type = ETHERTYPE_ARP;
+        packet_tx_push_header(resp_packet, &resp, sizeof(resp));
+        ethernet_mac_copy(resp_packet->tx.meta.ethernet.dhost, packet->SHA);
+        resp_packet->tx.meta.ethernet.ether_type = ETHERTYPE_ARP;
         protocol_inject_tx(resp_packet, ETHERNET);
         break;
     }

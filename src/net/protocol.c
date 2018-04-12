@@ -167,7 +167,7 @@ static void protocol_gatherer_task(void *arg __unused)
 
         thread_preempt_enable_intr_restore(primask);
 
-        pkt = packet_create(f->data, f->frame_sz);
+        pkt = packet_rx_create(f->data, f->frame_sz);
 
         if (!pkt) {
             printf("Protocol: Warning: Could not allocate packet\n");

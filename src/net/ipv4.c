@@ -35,7 +35,7 @@ static void ipv4_compute_checksum(ipv4_header *header)
 
 static void ipv4_rx_packet(struct packet_t *pkt)
 {
-    ipv4_header *header = (ipv4_header *)pkt->cur_data;
+    ipv4_header *header = (ipv4_header *)pkt->rx.cur_data;
     size_t header_len;
 
     ipv4_swap_endian(header);
@@ -43,9 +43,9 @@ static void ipv4_rx_packet(struct packet_t *pkt)
     /* TODO: checksum checking. */
 
     header_len = header->ihl * 4;
-    pkt->cur_data += header_len;
-    pkt->cur_data_length -= header_len;
-    pkt->rx_data.ipv4_payload_len = header->tot_length - header_len;
+    pkt->rx.cur_data += header_len;
+    pkt->rx.cur_data_length -= header_len;
+    pkt->rx.meta.ipv4_payload_len = header->tot_length - header_len;
 
     /* Drop packet if ttl is zero. */
     if (!header->ttl) {
@@ -89,8 +89,8 @@ static uint32_t ipv4_get_pkt_dst(uint32_t dst_ip)
 static void ipv4_tx_packet(struct packet_t *pkt)
 {
     ipv4_header header;
-    size_t packet_buf_len = sizeof(header) + pkt->data_length;
-    uint32_t pkt_dst_ip = ipv4_get_pkt_dst(pkt->tx_data.ipv4.dst_ip);
+    size_t packet_buf_len = sizeof(header) + pkt->tx.total_len;
+    uint32_t pkt_dst_ip = ipv4_get_pkt_dst(pkt->tx.meta.ipv4.dst_ip);
     const uint8_t *dst_hw_addr = resolve_address(pkt_dst_ip);
 
     memset(&header, 0, sizeof(header));
@@ -104,17 +104,17 @@ static void ipv4_tx_packet(struct packet_t *pkt)
     header.ihl = 5;
     header.tot_length = packet_buf_len;
     header.ttl = DEFAULT_TTL;
-    header.protocol = pkt->tx_data.ipv4.protocol;
+    header.protocol = pkt->tx.meta.ipv4.protocol;
     header.src_ip = OUR_IP_ADDRESS;
-    header.dst_ip = pkt->tx_data.ipv4.dst_ip;
+    header.dst_ip = pkt->tx.meta.ipv4.dst_ip;
 
     ipv4_swap_endian(&header);
 
     ipv4_compute_checksum(&header);
 
-    packet_push_header(pkt, &header, sizeof(header));
-    ethernet_mac_copy(pkt->tx_data.ethernet.dhost, dst_hw_addr);
-    pkt->tx_data.ethernet.ether_type = ETHERTYPE_IP;
+    packet_tx_push_header(pkt, &header, sizeof(header));
+    ethernet_mac_copy(pkt->tx.meta.ethernet.dhost, dst_hw_addr);
+    pkt->tx.meta.ethernet.ether_type = ETHERTYPE_IP;
     pkt->handler = ETHERNET;
 }
 

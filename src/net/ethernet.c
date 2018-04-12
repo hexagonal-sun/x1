@@ -27,14 +27,14 @@ static void ethernet_tx_pkt(struct packet_t *pkt)
     const uint8_t *ether_addr = emac_get_mac_address();
 
     for (i = 0; i < ETHER_ADDR_LEN; i++) {
-        header.ether_dhost[i] = pkt->tx_data.ethernet.dhost[i];
+        header.ether_dhost[i] = pkt->tx.meta.ethernet.dhost[i];
         header.ether_shost[i] = ether_addr[i];
     }
 
-    header.ether_type = pkt->tx_data.ethernet.ether_type;
+    header.ether_type = pkt->tx.meta.ethernet.ether_type;
     swap_endian16(&header.ether_type);
 
-    packet_push_header(pkt, &header, sizeof(header));
+    packet_tx_push_header(pkt, &header, sizeof(header));
 
     pkt->handler = EMAC;
 }
@@ -42,9 +42,9 @@ static void ethernet_tx_pkt(struct packet_t *pkt)
 static void ethernet_rx_pkt(struct packet_t *pkt)
 {
     static int no_dropped_packets;
-    ethernet_header *header = (ethernet_header *)pkt->cur_data;
-    pkt->cur_data += sizeof(*header);
-    pkt->cur_data_length -= sizeof(*header);
+    ethernet_header *header = (ethernet_header *)pkt->rx.cur_data;
+    pkt->rx.cur_data += sizeof(*header);
+    pkt->rx.cur_data_length -= sizeof(*header);
 
     swap_endian16(&header->ether_type);
 
