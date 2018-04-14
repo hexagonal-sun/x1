@@ -18,6 +18,12 @@ static uint8_t fragment_buf[FRAG_BUF_SIZE];
 static uint8_t mac_address[ETHER_ADDR_LEN] = {0, 1, 2, 3, 4, 5};
 static struct mutex emac_mutex;
 
+/* Statistics */
+static uint64_t tx_packets;
+static uint64_t rx_packets;
+static uint64_t dropped_fragments;
+
+
 typedef struct
 {
     void *packet;
@@ -67,11 +73,14 @@ static void emac_irq(void *arg __unused)
         if (error) {
             printf("emac: Warning: fragment dropped\n");
             cbuf_clear(&fragment_cbuf);
+            dropped_fragments++;
         }
 
         /* Do we have a full frame? */
-        if (rx_status[desc_idx].status_info & (1 << 30))
+        if (rx_status[desc_idx].status_info & (1 << 30)) {
+            rx_packets++;
             protocol_inject_rx(&fragment_cbuf);
+        }
 
         desc_idx += 1;
         desc_idx %= DESC_LEN;
@@ -148,15 +157,29 @@ static void emac_tx_frame(struct packet_t *pkt)
     /* Wait for xmit to complete. */
     while (LPC_EMAC->TxProduceIndex != LPC_EMAC->TxConsumeIndex) {};
 
+    tx_packets++;
+
     mutex_unlock(&emac_mutex);
 
     pkt->handler = DROP;
+}
+
+static void emac_print_stats(void)
+{
+    printf("Tx packets:\t%llu\n", tx_packets);
+    printf("Rx packets:\t%llu\n", rx_packets);
+    printf("Dropped fragments:\t%llu\n", dropped_fragments);
+    printf("TxConsumeIndex:\t%ld\n", LPC_EMAC->TxConsumeIndex);
+    printf("TxProduceIndex:\t%ld\n", LPC_EMAC->TxProduceIndex);
+    printf("RxConsumeIndex:\t%ld\n", LPC_EMAC->RxConsumeIndex);
+    printf("RxProduceIndex:\t%ld\n", LPC_EMAC->RxProduceIndex);
 }
 
 static struct protocol_t emac_protocol = {
     .type = EMAC,
     .tx_pkt = emac_tx_frame,
     .name = "Ethernet MAC",
+    .print_statistics = emac_print_stats,
 };
 
 const uint8_t *emac_get_mac_address(void)
