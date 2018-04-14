@@ -199,7 +199,8 @@ static void arp_rx_packet(struct packet_t *pkt)
 
 struct protocol_t arp_protocol = {
     .type = ARP,
-    .rx_pkt = arp_rx_packet
+    .rx_pkt = arp_rx_packet,
+    .name = "ARP"
 };
 
 void arp_init(void)

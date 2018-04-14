@@ -156,6 +156,7 @@ static void emac_tx_frame(struct packet_t *pkt)
 static struct protocol_t emac_protocol = {
     .type = EMAC,
     .tx_pkt = emac_tx_frame,
+    .name = "Ethernet MAC",
 };
 
 const uint8_t *emac_get_mac_address(void)

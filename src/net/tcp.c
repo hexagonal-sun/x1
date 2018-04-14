@@ -570,7 +570,8 @@ void tcp_close(tcb *connection)
 
 static struct protocol_t tcp_protocol  = {
     .rx_pkt = tcp_rx_packet,
-    .type = TCP
+    .type = TCP,
+    .name = "TCP"
 };
 
 void tcp_init(void)

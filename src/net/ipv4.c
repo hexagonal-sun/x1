@@ -122,7 +122,8 @@ static void ipv4_tx_packet(struct packet_t *pkt)
 static struct protocol_t ipv4_protocol = {
     .rx_pkt = ipv4_rx_packet,
     .tx_pkt = ipv4_tx_packet,
-    .type = IPV4
+    .type = IPV4,
+    .name = "IPv4"
 };
 
 void ipv4_init(void)

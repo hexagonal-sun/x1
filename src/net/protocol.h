@@ -26,6 +26,7 @@ struct protocol_t
     enum protocol_type type;
     protocol_func_t rx_pkt;
     protocol_func_t tx_pkt;
+    const char *name;
     struct list next_protocol;
 };
 

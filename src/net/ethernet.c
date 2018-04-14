@@ -69,7 +69,8 @@ static void ethernet_rx_pkt(struct packet_t *pkt)
 struct protocol_t ethernet_protocol = {
     .type = ETHERNET,
     .rx_pkt = ethernet_rx_pkt,
-    .tx_pkt = ethernet_tx_pkt
+    .tx_pkt = ethernet_tx_pkt,
+    .name = "Ethernet"
 };
 
 void ethernet_init(void)

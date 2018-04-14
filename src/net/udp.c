@@ -126,7 +126,8 @@ void udp_xmit_packet(uint16_t dst_port, uint32_t dst_ip, void *payload,
 
 static struct protocol_t udp_procotol = {
     .rx_pkt = udp_rx_packet,
-    .type = UDP
+    .type = UDP,
+    .name = "UDP"
 };
 
 void udp_init(void)
