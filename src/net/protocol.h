@@ -26,6 +26,7 @@ struct protocol_t
     enum protocol_type type;
     protocol_func_t rx_pkt;
     protocol_func_t tx_pkt;
+    void (* print_statistics)(void);
     const char *name;
     struct list next_protocol;
 };
@@ -33,6 +34,7 @@ struct protocol_t
 #define for_each_protocol(pos)                                  \
     list_for_each_entry(&protocol_head, (pos), next_protocol)
 
+void protocol_print_stats(void);
 void protocol_inject_rx(struct cbuf *cbuf);
 void protocol_inject_tx(struct packet_t *pkt, enum protocol_type type);
 void protocol_register(struct protocol_t *protocol);

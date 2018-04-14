@@ -8,6 +8,8 @@ static void net_shell_stats(int argc, char *argv[])
 {
     (void)argc;
     (void)argv;
+
+    protocol_print_stats();
 }
 
 static struct shell_cmd net_shell_cmds[] = {

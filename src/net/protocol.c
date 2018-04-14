@@ -54,6 +54,20 @@ static bool rx_buf_empty(void)
     return rx_frame_prod_idx == rx_frame_cons_idx;
 }
 
+void protocol_print_stats()
+{
+    struct protocol_t *proto;
+
+    for_each_protocol(proto)
+        if (proto->print_statistics) {
+            printf("Stats for protocol: %s\n", proto->name);
+
+            proto->print_statistics();
+
+            putchar('\n');
+        }
+}
+
 void protocol_inject_rx(struct cbuf *cbuf)
 {
     struct frame *f;
