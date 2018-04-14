@@ -15,6 +15,7 @@
 #include "ipv4.h"
 #include "udp.h"
 #include "tcp.h"
+#include "netshell.h"
 
 static LIST(protocol_head);
 static LIST(pkt_q);
@@ -196,6 +197,7 @@ void protocol_setup(void)
     ipv4_init();
     udp_init();
     tcp_init();
+    net_shell_init();
 
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,
