@@ -97,31 +97,39 @@ static void udp_rx_packet(struct packet_t *pkt)
     mutex_unlock(&udp_mutex);
 }
 
+void udp_xmit_packet_paylaod(uint16_t dst_port, uint32_t dst_ip,
+                     struct packet_t *payload)
+{
+    udp_header header;
+
+    memset(&header, 0, sizeof(header));
+
+    header.src_port = 0;
+    header.dst_port = dst_port;
+    header.length = sizeof(header) + payload->tx.total_len;
+    header.checksum = 0;
+
+    udp_swap_endian(&header);
+
+    packet_tx_push_header(payload, &header, sizeof(header));
+
+    payload->tx.meta.ipv4.dst_ip = dst_ip;
+    payload->tx.meta.ipv4.protocol = IP_PROTO_UDP;
+
+    protocol_inject_tx(payload, IPV4);
+}
+
 void udp_xmit_packet(uint16_t dst_port, uint32_t dst_ip, void *payload,
                      int payload_len)
 {
     struct packet_t *pkt = packet_tx_create();
-    udp_header header;
 
     if (!pkt)
         return;
 
     packet_tx_push_header(pkt, payload, payload_len);
 
-    memset(&header, 0, sizeof(header));
-
-    header.src_port = 0;
-    header.dst_port = dst_port;
-    header.length = sizeof(header) + payload_len;
-    header.checksum = 0;
-
-    udp_swap_endian(&header);
-
-    packet_tx_push_header(pkt, &header, sizeof(header));
-    pkt->tx.meta.ipv4.dst_ip = dst_ip;
-    pkt->tx.meta.ipv4.protocol = IP_PROTO_UDP;
-
-    protocol_inject_tx(pkt, IPV4);
+    udp_xmit_packet_paylaod(dst_port, dst_ip, pkt);
 }
 
 static struct protocol_t udp_procotol = {
