@@ -1,9 +1,25 @@
 #include <stdio.h>
 #include <lib/shell.h>
+#include <lib/byteswap.h>
 
 #include "protocol.h"
 #include "dns.h"
 #include "netshell.h"
+
+static void print_ipv4_address(uint32_t address)
+{
+    swap_endian32(&address);
+
+    for (size_t i = 0; i < 4; i++)
+    {
+        uint8_t octet = (address >> (i * 8)) & 0xff;
+
+        printf("%d", octet);
+
+        if (i != 3)
+            printf(".");
+    }
+}
 
 static void net_shell_resolve(int argc, char *argv[])
 {
@@ -24,7 +40,9 @@ static void net_shell_resolve(int argc, char *argv[])
         return;
     }
 
-    printf("Resolved addr to: 0x%lX\n", addr);
+    printf("Resolved addr to: ");
+    print_ipv4_address(addr);
+    printf("\n");
 }
 
 static void net_shell_stats(int argc, char *argv[])
