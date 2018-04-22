@@ -1,0 +1,3 @@
+#include <lib/bitfields.h>
+DEFBITFLAG(RD, 8, flags, struct dns_header);
+DEFBITFLAG(QR, 15, flags, struct dns_header);
