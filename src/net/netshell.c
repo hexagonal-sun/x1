@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <lib/shell.h>
 #include <lib/byteswap.h>
+#include <network/dns.h>
 
 #include "protocol.h"
-#include "dns.h"
 #include "netshell.h"
 
 static void print_ipv4_address(uint32_t address)

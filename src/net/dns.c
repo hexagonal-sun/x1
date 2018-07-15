@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <lib/byteswap.h>
 #include <network/udp.h>
+#include <network/dns.h>
 
-#include "dns.h"
 #include "packet.h"
 #include "udp.h"
 
