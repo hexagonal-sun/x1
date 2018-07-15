@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <lib/byteswap.h>
+#include <network/udp.h>
 
 #include "dns.h"
 #include "packet.h"

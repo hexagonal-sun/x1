@@ -6,6 +6,7 @@
 #include <lib/cbuf.h>
 #include <src/mutex.h>
 #include <src/condvar.h>
+#include <network/udp.h>
 
 #include "ipv4.h"
 #include "packet.h"
