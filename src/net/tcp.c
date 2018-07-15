@@ -2,6 +2,7 @@
 #include <src/mutex.h>
 #include <src/condvar.h>
 #include <src/panic.h>
+#include <network/tcp.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
@@ -351,7 +352,7 @@ static void tcp_rx_packet(struct packet_t *pkt)
 }
 
 /* Perform a 3-way handshake and establish a TCP connection. */
-tcb *tcp_connect(uint16_t port, uint32_t ip)
+void *tcp_connect(uint16_t port, uint32_t ip)
 {
     tcp_header header;
     tcb *new_tcb = malloc(sizeof(*new_tcb));
@@ -400,10 +401,10 @@ tcb *tcp_connect(uint16_t port, uint32_t ip)
     }
 
     mutex_unlock(&tcp_mutex);
-    return new_tcb;
+    return (void *)new_tcb;
 }
 
-tcb *tcp_listen(uint16_t port)
+void *tcp_listen(uint16_t port)
 {
     tcp_header header, resp;
     tcb *new_tcb = malloc(sizeof(*new_tcb));
@@ -463,13 +464,14 @@ tcb *tcp_listen(uint16_t port)
 
 out:
     mutex_unlock(&tcp_mutex);
-    return new_tcb;
+    return (void *)new_tcb;
 }
 
-void tcp_tx_data(tcb *connection, void *data, size_t len)
+void tcp_tx_data(void *conn, void *data, size_t len)
 {
     tcp_header header;
     void *payload;
+    tcb *connection = (tcb *)conn;
 
     mutex_lock(&tcp_mutex);
 
@@ -500,9 +502,10 @@ out:
     mutex_unlock(&tcp_mutex);
 }
 
-int tcp_rx_data(tcb *connection, void *dst_buf, size_t len)
+int tcp_rx_data(void *conn, void *dst_buf, size_t len)
 {
     int ret = EINVAL;
+    tcb *connection = (tcb *)conn;
 
     mutex_lock(&tcp_mutex);
 
@@ -535,8 +538,10 @@ out:
     return ret;
 }
 
-void tcp_close(tcb *connection)
+void tcp_close(void *conn)
 {
+    tcb *connection = (tcb *)conn;
+
     if (connection->state == CLOSE_WAIT) {
         tcp_header our_fin;
 

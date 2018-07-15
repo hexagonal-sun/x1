@@ -56,21 +56,6 @@ typedef struct
     struct list node;
 } tcb;
 
-/* Perform a 3-way handshake and establish a TCP connection. */
-tcb *tcp_connect(uint16_t port, uint32_t ip);
-
-/* Listen for an incoming connection on a specific port. */
-tcb *tcp_listen(uint16_t port);
-
-/* Send data down an already-established TCP connection. */
-void tcp_tx_data(tcb *connection, void *data, size_t len);
-
-/* Receive data down an already-established TCP connection. */
-int tcp_rx_data(tcb *connection, void *dst_buf, size_t len);
-
-/* Closed an established TCP connection. */
-void tcp_close(tcb *connection);
-
 /* Initialise the TCP layer. */
 void tcp_init(void);
 
