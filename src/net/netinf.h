@@ -2,7 +2,6 @@
 
 #include <src/mutex.h>
 #include <lib/cbuf.h>
-#include <src/condvar.h>
 
 #include "packet.h"
 
@@ -17,6 +16,10 @@ struct frame
     size_t frame_sz;
 };
 
+struct ipv4_data_t {
+    uint32_t addr, netmask, gateway;
+};
+
 struct netinf {
     unsigned int frame_buf_prod_idx;
     unsigned int frame_buf_cons_idx;
@@ -26,6 +29,7 @@ struct netinf {
     tx_callback_t tx_callback;
     const char *name;
     struct list next_interface;
+    struct ipv4_data_t ipv4_data;
 };
 
 /* Take all data in `frag_buf' and insert it into the networking
