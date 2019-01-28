@@ -220,7 +220,16 @@ int dns_resolve_ipv4(const char *hostname, uint32_t *ipv4_address)
     enum RCODES rcode;
 
     if (!dns_packet)
-        return ENOMEM;
+        return -ENOMEM;
+
+    struct netinf *interface = netinf_get_for_ipv4_addr(DNS_SERVER);
+
+    if (!interface) {
+        packet_destroy(dns_packet);
+        return -ENOENT;
+    }
+
+    packet_set_interface(dns_packet, interface);
 
     ret = create_domain_label_from_hostname(hostname,
                                             &question.QNAME);

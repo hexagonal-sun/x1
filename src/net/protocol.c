@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include <lib/macros.h>
 #include <src/mem.h>
@@ -93,6 +94,16 @@ static void protocol_task(void *arg __unused)
         mutex_unlock(&pkt_q_mutex);
 
         while (pkt) {
+            if (pkt->handler == INTERFACE) {
+
+                assert(pkt->dir == TX);
+
+                pkt->interface->tx_callback(pkt);
+
+                packet_destroy(pkt);
+                break;
+            }
+
             struct protocol_t *proto = resolve_pkt_protocol(pkt);
 
             if (!proto) {

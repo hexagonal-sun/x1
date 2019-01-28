@@ -9,6 +9,7 @@
 #include <network/udp.h>
 
 #include "ipv4.h"
+#include "netinf.h"
 #include "packet.h"
 #include "protocol.h"
 #include "udp.h"
@@ -163,17 +164,28 @@ void udp_xmit_packet_paylaod(uint16_t src_port, uint16_t dst_port,
     protocol_inject_tx(payload, IPV4);
 }
 
-void udp_xmit_packet(uint16_t src_port, uint16_t dst_port, uint32_t dst_ip,
-                     void *payload, int payload_len)
+int udp_xmit_packet(uint16_t src_port, uint16_t dst_port, uint32_t dst_ip,
+                    void *payload, int payload_len)
 {
     struct packet_t *pkt = packet_tx_create();
 
     if (!pkt)
-        return;
+        return -ENOMEM;
+
+    struct netinf *interface = netinf_get_for_ipv4_addr(dst_ip);
+
+    if (!interface) {
+        packet_destroy(pkt);
+        return -ENOENT;
+    }
+
+    packet_set_interface(pkt, interface);
 
     packet_tx_push_header(pkt, payload, payload_len);
 
     udp_xmit_packet_paylaod(src_port, dst_port, dst_ip, pkt);
+
+    return payload_len;
 }
 
 static struct protocol_t udp_procotol = {

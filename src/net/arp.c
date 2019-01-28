@@ -69,6 +69,18 @@ const uint8_t *resolve_address(uint32_t ip_address)
     const uint8_t *our_mac_address = emac_get_mac_address();
     arp_packet arp_request;
 
+    if (!pkt)
+        return NULL;
+
+    struct netinf *interface = netinf_get_for_ipv4_addr(ip_address);
+
+    if (!interface) {
+        packet_destroy(pkt);
+        return NULL;
+    }
+
+    packet_set_interface(pkt, interface);
+
     memset(&arp_request, 0, sizeof(arp_request));
 
     /* Fill in ARP request fields. */
@@ -134,6 +146,8 @@ static void arp_rx_packet(struct packet_t *pkt)
     {
         struct packet_t *resp_packet = packet_tx_create();
         arp_packet resp;
+
+        packet_set_interface(resp_packet, pkt->interface);
 
         memset(&resp, 0, sizeof(resp));
 

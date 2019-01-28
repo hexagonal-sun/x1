@@ -36,7 +36,7 @@ static void ethernet_tx_pkt(struct packet_t *pkt)
 
     packet_tx_push_header(pkt, &header, sizeof(header));
 
-    pkt->handler = EMAC;
+    pkt->handler = INTERFACE;
 }
 
 static void ethernet_rx_pkt(struct packet_t *pkt)

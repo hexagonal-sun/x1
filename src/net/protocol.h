@@ -7,7 +7,7 @@
 struct packet_t;
 
 enum protocol_type {
-    EMAC,
+    INTERFACE,
     ETHERNET,
     IPV4,
     UDP,

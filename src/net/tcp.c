@@ -94,10 +94,18 @@ static void tcp_tx(tcp_header header, uint32_t dest_ip,
                    void *payload, size_t payload_len)
 {
     struct packet_t *pkt = packet_tx_create();
+    struct netinf *interface = netinf_get_for_ipv4_addr(dest_ip);
     tcp_pseudo pheader;
 
     if (!pkt)
         return;
+
+    if (!interface) {
+        packet_destroy(pkt);
+        return;
+    }
+
+    packet_set_interface(pkt, interface);
 
     if (payload)
         packet_tx_push_header(pkt, payload, payload_len);

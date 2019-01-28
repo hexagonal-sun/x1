@@ -122,7 +122,8 @@ static void emac_tx_frame(struct packet_t *pkt)
 {
     size_t desc_idx, i;
 
-    assert(pkt->handler == EMAC);
+    assert(pkt->handler == INTERFACE);
+    assert(pkt->interface == interface);
     assert(pkt->dir == TX);
     assert(pkt->tx.header_ptr < DESC_LEN);
 
@@ -176,13 +177,6 @@ static void emac_print_stats(void)
     printf("RxConsumeIndex:\t%ld\n", LPC_EMAC->RxConsumeIndex);
     printf("RxProduceIndex:\t%ld\n", LPC_EMAC->RxProduceIndex);
 }
-
-static struct protocol_t emac_protocol = {
-    .type = EMAC,
-    .tx_pkt = emac_tx_frame,
-    .name = "Ethernet MAC",
-    .print_statistics = emac_print_stats,
-};
 
 const uint8_t *emac_get_mac_address(void)
 {
@@ -284,6 +278,5 @@ void emac_init(void)
 
     cpu_irq_register(IRQ_EMAC, emac_irq, NULL);
 
-    protocol_register(&emac_protocol);
     interface = netinf_create("eth0", &emac_tx_frame, ETHERNET);
 }
