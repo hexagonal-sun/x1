@@ -1,6 +1,7 @@
 #pragma once
 
 #include "protocol.h"
+#include "netinf.h"
 
 #define NO_PACKET_HEADERS 8
 
@@ -59,10 +60,19 @@ struct packet_t
         size_t header_ptr;
         size_t total_len;
     } tx;
+
+    struct netinf *interface;
 };
 
 struct packet_t *packet_rx_create(void *frame, size_t frame_len);
 struct packet_t *packet_tx_create(void);
+
+static inline void packet_set_interface(struct packet_t *pkt,
+                                        struct netinf *interface)
+{
+    pkt->interface = interface;
+}
+
 int packet_tx_push_header(struct packet_t *pkt, void *header_data,
                        size_t header_len);
 int packet_tx_push_header_end(struct packet_t *pkt, void *header,
