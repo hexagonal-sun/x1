@@ -107,6 +107,10 @@ struct netinf *netinf_create(const char *name,
     thread_create(&ret->frame_gatherer_task, frame_gatherer_task, ret,
                   "Frame Gatherer Task", 1024, THREAD_MIN_PRIORITY);
 
+    mutex_lock(&interface_list_mutex);
+    list_insert_head(&interface_head, &ret->next_interface);
+    mutex_unlock(&interface_list_mutex);
+
     return ret;
 }
 
