@@ -119,6 +119,7 @@ void protocol_setup(void)
 {
     mutex_init(&pkt_q_mutex);
     condvar_init(&pkt_q_condvar);
+    netinf_init();
     ethernet_init();
     emac_init();
     arp_init();
@@ -126,7 +127,6 @@ void protocol_setup(void)
     udp_init();
     tcp_init();
     net_shell_init();
-    netinf_init();
 
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,
