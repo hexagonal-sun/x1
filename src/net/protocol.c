@@ -19,39 +19,20 @@
 
 static LIST(protocol_head);
 static LIST(pkt_q);
-static LIST(rx_pkt_q);
 static struct mutex pkt_q_mutex;
 static struct condvar pkt_q_condvar;
-struct thread *pkt_waiter;
-
-#define RX_PACKET_BUF_SIZE 4
-#define FRAME_DATA_SIZE 1700
-
-struct frame
-{
-    uint8_t data[FRAME_DATA_SIZE];
-    size_t frame_sz;
-};
-
-static unsigned int rx_frame_prod_idx;
-static unsigned int rx_frame_cons_idx;
-static struct frame rx_frames[RX_PACKET_BUF_SIZE];
-
 
 #define NO_PROTO_WORKERS 3
 
 
-static bool is_rx_buf_full(void)
+void protocol_rx_packet(struct packet_t *pkt)
 {
-    if ((rx_frame_prod_idx + 1) % RX_PACKET_BUF_SIZE == rx_frame_cons_idx)
-        return true;
-    else
-        return false;
-}
+    mutex_lock(&pkt_q_mutex);
 
-static bool rx_buf_empty(void)
-{
-    return rx_frame_prod_idx == rx_frame_cons_idx;
+    list_insert_head(&pkt_q, &pkt->node);
+    condvar_signal(&pkt_q_condvar);
+
+    mutex_unlock(&pkt_q_mutex);
 }
 
 void protocol_print_stats()
@@ -66,34 +47,6 @@ void protocol_print_stats()
 
             putchar('\n');
         }
-}
-
-void protocol_inject_rx(struct cbuf *cbuf)
-{
-    struct frame *f;
-    size_t frame_sz = cbuf_size(cbuf);
-
-    if (is_rx_buf_full()) {
-        printf("Protocol: RX buffer full; frame dropped.\n");
-        cbuf_clear(cbuf);
-        return;
-    }
-
-    if (frame_sz > FRAME_DATA_SIZE) {
-        printf("Protocol: Frame size greater than RX frame buffer; "
-               "frame dropped\n");
-        cbuf_clear(cbuf);
-        return;
-    }
-
-    f = &rx_frames[rx_frame_prod_idx];
-    rx_frame_prod_idx++;
-    rx_frame_prod_idx %= RX_PACKET_BUF_SIZE;
-
-    cbuf_pop(cbuf, f->data, &frame_sz);
-    f->frame_sz = frame_sz;
-
-    thread_wakeup(pkt_waiter);
 }
 
 void protocol_inject_tx(struct packet_t *pkt, enum protocol_type type)
@@ -162,45 +115,6 @@ static void protocol_task(void *arg __unused)
     }
 }
 
-static void protocol_gatherer_task(void *arg __unused)
-{
-    for (;;)
-    {
-        uint32_t primask = thread_preempt_disable_intr_save();
-        struct packet_t *pkt;
-        struct frame *f;
-
-        while (rx_buf_empty()) {
-            pkt_waiter = thread_self();
-            thread_sleep();
-            pkt_waiter = NULL;
-        }
-
-        f = &rx_frames[rx_frame_cons_idx];
-        rx_frame_cons_idx++;
-        rx_frame_cons_idx %= RX_PACKET_BUF_SIZE;
-
-        thread_preempt_enable_intr_restore(primask);
-
-        pkt = packet_rx_create(f->data, f->frame_sz);
-
-        if (!pkt) {
-            printf("Protocol: Warning: Could not allocate packet\n");
-            continue;
-        }
-
-        pkt->handler = ETHERNET;
-        pkt->dir = RX;
-
-        mutex_lock(&pkt_q_mutex);
-
-        list_insert_head(&pkt_q, &pkt->node);
-        condvar_signal(&pkt_q_condvar);
-
-        mutex_unlock(&pkt_q_mutex);
-    }
-}
-
 void protocol_setup(void)
 {
     mutex_init(&pkt_q_mutex);
@@ -216,7 +130,4 @@ void protocol_setup(void)
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,
                       "Protocol worker thread", 1024, THREAD_MIN_PRIORITY);
-
-    thread_create(NULL, protocol_gatherer_task, NULL,
-                  "Protocol Gatherer Task", 1024, THREAD_MIN_PRIORITY);
 }

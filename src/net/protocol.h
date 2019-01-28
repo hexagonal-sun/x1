@@ -35,7 +35,7 @@ struct protocol_t
     list_for_each_entry(&protocol_head, (pos), next_protocol)
 
 void protocol_print_stats(void);
-void protocol_inject_rx(struct cbuf *cbuf);
+void protocol_rx_packet(struct packet_t *pkt);
 void protocol_inject_tx(struct packet_t *pkt, enum protocol_type type);
 void protocol_register(struct protocol_t *protocol);
 void protocol_setup(void);
