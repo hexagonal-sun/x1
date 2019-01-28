@@ -25,6 +25,7 @@ struct netinf {
     enum protocol_type rx_frame_protocol;
     tx_callback_t tx_callback;
     const char *name;
+    struct list next_interface;
 };
 
 /* Take all data in `frag_buf' and insert it into the networking
@@ -41,3 +42,5 @@ void netinf_rx_frame(struct netinf *interface,
 struct netinf *netinf_create(const char *name,
                              tx_callback_t tx_callback,
                              enum protocol_type rx_frame_protocol);
+
+void netinf_init(void);

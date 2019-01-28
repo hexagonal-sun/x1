@@ -126,6 +126,7 @@ void protocol_setup(void)
     udp_init();
     tcp_init();
     net_shell_init();
+    netinf_init();
 
     for (size_t i = 0; i < NO_PROTO_WORKERS; i++)
         thread_create(NULL, protocol_task, NULL,

@@ -4,6 +4,12 @@
 
 #include "netinf.h"
 
+static LIST(interface_head);
+static struct mutex interface_list_mutex;
+
+#define for_each_interface(pos)                                 \
+    list_for_each_entry(&interface_head, (pos), next_interface)
+
 static bool is_frame_buf_full(struct netinf *interface)
 {
     if ((interface->frame_buf_prod_idx + 1) %
@@ -102,4 +108,9 @@ struct netinf *netinf_create(const char *name,
                   "Frame Gatherer Task", 1024, THREAD_MIN_PRIORITY);
 
     return ret;
+}
+
+void netinf_init(void)
+{
+    mutex_init(&interface_list_mutex);
 }
