@@ -199,7 +199,8 @@ SOURCES = \
 	src/net/udp.c \
 	src/net/tcp.c \
 	src/net/netshell.c \
-	src/net/dns.c
+	src/net/dns.c \
+	src/net/netinf.c
 
 SOURCES += \
 	lib/cbuf.c \
