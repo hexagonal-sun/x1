@@ -46,6 +46,8 @@ static void frame_gatherer_task(void *data)
 
         pkt = packet_rx_create(f->data, f->frame_sz);
 
+        pkt->interface = inf;
+
         if (!pkt) {
             printf("Protocol: Warning: Could not allocate packet\n");
             continue;
