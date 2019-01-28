@@ -116,6 +116,52 @@ struct netinf *netinf_create(const char *name,
     return ret;
 }
 
+static bool has_valid_gateway(struct netinf *interface)
+{
+    uint32_t netmask = interface->ipv4_data.netmask;
+
+    if (!interface->ipv4_data.gateway)
+        return false;
+
+    if ((interface->ipv4_data.addr & netmask) ==
+        (interface->ipv4_data.gateway & netmask))
+        return true;
+
+    return false;
+}
+
+struct netinf *netinf_get_for_ipv4_addr(uint32_t dst_addr)
+{
+    struct netinf *interface, *ret = NULL;
+
+    mutex_lock(&interface_list_mutex);
+
+    /* First, see if there are any interfaces that are on the subnet
+     * requested. */
+    for_each_interface(interface) {
+        uint32_t netmask = interface->ipv4_data.netmask;
+        uint32_t dst_subnet = dst_addr & netmask;
+        uint32_t src_subnet = interface->ipv4_data.addr & netmask;
+
+        if (dst_subnet == src_subnet) {
+            ret = interface;
+            goto out;
+        }
+    }
+
+    /* If we couldn't find an interface that is on the same subnet as
+     * `dst_addr', find one that has a default gateway set. */
+    for_each_interface(interface)
+        if (has_valid_gateway(interface)) {
+            ret = interface;
+            goto out;
+        }
+
+out:
+    mutex_unlock(&interface_list_mutex);
+    return ret;
+}
+
 void netinf_init(void)
 {
     mutex_init(&interface_list_mutex);
