@@ -279,4 +279,6 @@ void emac_init(void)
     cpu_irq_register(IRQ_EMAC, emac_irq, NULL);
 
     interface = netinf_create("eth0", &emac_tx_frame, ETHERNET);
+    interface->ipv4_data.addr = 0xC0A80463;
+    interface->ipv4_data.netmask = 0xFFFFFF00;
 }
