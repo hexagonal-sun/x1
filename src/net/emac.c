@@ -10,10 +10,12 @@
 #include "packet.h"
 #include "protocol.h"
 #include "emac.h"
+#include "netinf.h"
 
 #define FRAG_BUF_SIZE 4096
 static struct cbuf fragment_cbuf;
 static uint8_t fragment_buf[FRAG_BUF_SIZE];
+struct netinf *interface;
 
 static uint8_t mac_address[ETHER_ADDR_LEN] = {0, 1, 2, 3, 4, 5};
 static struct mutex emac_mutex;
@@ -79,7 +81,7 @@ static void emac_irq(void *arg __unused)
         /* Do we have a full frame? */
         if (rx_status[desc_idx].status_info & (1 << 30)) {
             rx_packets++;
-            protocol_inject_rx(&fragment_cbuf);
+            netinf_rx_frame(interface, &fragment_cbuf);
         }
 
         desc_idx += 1;
@@ -283,4 +285,5 @@ void emac_init(void)
     cpu_irq_register(IRQ_EMAC, emac_irq, NULL);
 
     protocol_register(&emac_protocol);
+    interface = netinf_create("eth0", &emac_tx_frame, ETHERNET);
 }
