@@ -162,6 +162,17 @@ out:
     return ret;
 }
 
+void netinf_for_each_interface(netinf_iter_callback_t callback)
+{
+    struct netinf *i;
+    mutex_lock(&interface_list_mutex);
+
+    for_each_interface(i)
+        callback(i);
+
+    mutex_unlock(&interface_list_mutex);
+}
+
 void netinf_init(void)
 {
     mutex_init(&interface_list_mutex);
