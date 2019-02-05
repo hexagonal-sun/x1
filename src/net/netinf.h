@@ -21,6 +21,9 @@ struct ipv4_data_t {
 };
 
 struct netinf {
+    uint64_t rx_packets;
+    uint64_t tx_packets;
+    uint64_t dropped_fragments;
     unsigned int frame_buf_prod_idx;
     unsigned int frame_buf_cons_idx;
     struct frame frame_buf[FRAME_BUF_ELMS];
