@@ -124,7 +124,8 @@ const uint8_t *resolve_address(uint32_t ip_address)
 static void arp_rx_packet(struct packet_t *pkt)
 {
     arp_packet *packet = (arp_packet *)pkt->rx.cur_data;
-    const uint8_t *our_mac_address = emac_get_mac_address();
+    struct netinf *interface = pkt->interface;
+    const uint8_t *our_mac_address = interface->ether_addr;
 
     /* This function will process any arp packets; they're not passed
      * to any other prtocol layers.  Therefore, we can drop this

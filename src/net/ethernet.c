@@ -24,7 +24,7 @@ static void ethernet_tx_pkt(struct packet_t *pkt)
 {
     int i;
     ethernet_header header;
-    const uint8_t *ether_addr = emac_get_mac_address();
+    const uint8_t *ether_addr = pkt->interface->ether_addr;
 
     for (i = 0; i < ETHER_ADDR_LEN; i++) {
         header.ether_dhost[i] = pkt->tx.meta.ethernet.dhost[i];

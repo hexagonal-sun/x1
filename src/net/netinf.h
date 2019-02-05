@@ -26,6 +26,7 @@ struct netinf {
     uint64_t dropped_fragments;
     unsigned int frame_buf_prod_idx;
     unsigned int frame_buf_cons_idx;
+    uint8_t ether_addr[ETHER_ADDR_LEN];
     struct frame frame_buf[FRAME_BUF_ELMS];
     struct thread *frame_gatherer_task;
     enum protocol_type rx_frame_protocol;

@@ -161,11 +161,6 @@ static void emac_tx_frame(struct packet_t *pkt)
     pkt->handler = DROP;
 }
 
-const uint8_t *emac_get_mac_address(void)
-{
-    return mac_address;
-}
-
 void emac_init(void)
 {
     int i;
@@ -264,4 +259,5 @@ void emac_init(void)
     interface = netinf_create("eth0", &emac_tx_frame, ETHERNET);
     interface->ipv4_data.addr = 0xC0A80463;
     interface->ipv4_data.netmask = 0xFFFFFF00;
+    memcpy(interface->ether_addr, mac_address, sizeof(interface->ether_addr));
 }

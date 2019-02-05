@@ -60,6 +60,13 @@ static void print_interface_stats(struct netinf *interface)
     printf("\n");
     printf("    Dropped fragments: %lld\n",
            interface->dropped_fragments);
+    printf("    HW address: %x:%x:%x:%x:%x:%x\n",
+           interface->ether_addr[0],
+           interface->ether_addr[1],
+           interface->ether_addr[2],
+           interface->ether_addr[3],
+           interface->ether_addr[4],
+           interface->ether_addr[5]);
 }
 
 static void net_shell_netinf_list(int argc, char *argv[])
