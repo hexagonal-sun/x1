@@ -65,21 +65,18 @@ const uint8_t *resolve_address(uint32_t ip_address)
      * We couldn't find an entry in the ARP table.  We need to send
      * out ARP packet to resolve address.
      */
-    struct packet_t *pkt = packet_tx_create();
-    const uint8_t *our_mac_address = emac_get_mac_address();
+    struct netinf *interface = netinf_get_for_ipv4_addr(ip_address);
+    struct packet_t *pkt;
+    const uint8_t *our_mac_address = interface->ether_addr;
     arp_packet arp_request;
+
+    if (!interface)
+        return NULL;
+
+    pkt = packet_tx_create(interface);
 
     if (!pkt)
         return NULL;
-
-    struct netinf *interface = netinf_get_for_ipv4_addr(ip_address);
-
-    if (!interface) {
-        packet_destroy(pkt);
-        return NULL;
-    }
-
-    packet_set_interface(pkt, interface);
 
     memset(&arp_request, 0, sizeof(arp_request));
 
@@ -144,10 +141,8 @@ static void arp_rx_packet(struct packet_t *pkt)
     {
     case OPER_REQUEST:
     {
-        struct packet_t *resp_packet = packet_tx_create();
+        struct packet_t *resp_packet = packet_tx_create(interface);
         arp_packet resp;
-
-        packet_set_interface(resp_packet, pkt->interface);
 
         memset(&resp, 0, sizeof(resp));
 

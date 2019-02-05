@@ -17,11 +17,12 @@ static struct packet_t *packet_empty()
     return ret;
 }
 
-struct packet_t *packet_tx_create()
+struct packet_t *packet_tx_create(struct netinf *interface)
 {
     struct packet_t *ret = packet_empty();
 
     ret->dir = TX;
+    ret->interface = interface;
 
     return ret;
 }

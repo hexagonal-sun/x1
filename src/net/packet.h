@@ -65,13 +65,7 @@ struct packet_t
 };
 
 struct packet_t *packet_rx_create(void *frame, size_t frame_len);
-struct packet_t *packet_tx_create(void);
-
-static inline void packet_set_interface(struct packet_t *pkt,
-                                        struct netinf *interface)
-{
-    pkt->interface = interface;
-}
+struct packet_t *packet_tx_create(struct netinf *interface);
 
 int packet_tx_push_header(struct packet_t *pkt, void *header_data,
                        size_t header_len);

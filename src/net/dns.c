@@ -213,23 +213,20 @@ int dns_resolve_ipv4(const char *hostname, uint32_t *ipv4_address)
 {
     int ret;
     struct dns_question question;
-    struct packet_t *dns_packet = packet_tx_create();
+    struct packet_t *dns_packet;
     struct dns_header header;
     struct dns_header response_hdr;
     void *udp_handle;
     enum RCODES rcode;
+    struct netinf *interface = netinf_get_for_ipv4_addr(DNS_SERVER);
+
+    if (!interface)
+        return -ENOENT;
+
+    dns_packet = packet_tx_create(interface);
 
     if (!dns_packet)
         return -ENOMEM;
-
-    struct netinf *interface = netinf_get_for_ipv4_addr(DNS_SERVER);
-
-    if (!interface) {
-        packet_destroy(dns_packet);
-        return -ENOENT;
-    }
-
-    packet_set_interface(dns_packet, interface);
 
     ret = create_domain_label_from_hostname(hostname,
                                             &question.QNAME);
