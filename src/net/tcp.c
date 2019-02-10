@@ -110,7 +110,7 @@ static void tcp_tx(tcp_header header, uint32_t dest_ip,
 
     memset(&pheader, 0, sizeof(pheader));
 
-    pheader.src = OUR_IP_ADDRESS;
+    pheader.src = interface->ipv4_data.addr;
     pheader.dst = dest_ip;
     pheader.proto = IP_PROTO_TCP;
     pheader.length = sizeof(header) + payload_len;

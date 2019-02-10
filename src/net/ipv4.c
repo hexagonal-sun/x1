@@ -54,7 +54,7 @@ static void ipv4_rx_packet(struct packet_t *pkt)
     }
 
     /* Drop packet if it is not addressed to us. */
-    if (header->dst_ip != OUR_IP_ADDRESS) {
+    if (header->dst_ip != pkt->interface->ipv4_data.addr) {
         pkt->handler = DROP;
         return;
     }
@@ -78,19 +78,23 @@ static void ipv4_rx_packet(struct packet_t *pkt)
     }
 }
 
-static uint32_t ipv4_get_pkt_dst(uint32_t dst_ip)
+static uint32_t ipv4_get_pkt_dst(uint32_t dst_ip, struct netinf *interface)
 {
-    if ((dst_ip & NET_MASK) == (OUR_IP_ADDRESS & NET_MASK))
+    uint32_t our_ip = interface->ipv4_data.addr,
+        netmask = interface->ipv4_data.netmask;
+
+    if ((dst_ip & netmask) == (our_ip & netmask))
         return dst_ip;
 
-    return IP_GATEWAY;
+    return interface->ipv4_data.gateway;
 }
 
 static void ipv4_tx_packet(struct packet_t *pkt)
 {
     ipv4_header header;
     size_t packet_buf_len = sizeof(header) + pkt->tx.total_len;
-    uint32_t pkt_dst_ip = ipv4_get_pkt_dst(pkt->tx.meta.ipv4.dst_ip);
+    uint32_t pkt_dst_ip = ipv4_get_pkt_dst(pkt->tx.meta.ipv4.dst_ip,
+                                           pkt->interface);
     const uint8_t *dst_hw_addr = resolve_address(pkt_dst_ip);
 
     memset(&header, 0, sizeof(header));
@@ -105,7 +109,7 @@ static void ipv4_tx_packet(struct packet_t *pkt)
     header.tot_length = packet_buf_len;
     header.ttl = DEFAULT_TTL;
     header.protocol = pkt->tx.meta.ipv4.protocol;
-    header.src_ip = OUR_IP_ADDRESS;
+    header.src_ip = pkt->interface->ipv4_data.addr;
     header.dst_ip = pkt->tx.meta.ipv4.dst_ip;
 
     ipv4_swap_endian(&header);

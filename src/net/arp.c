@@ -88,7 +88,7 @@ const uint8_t *resolve_address(uint32_t ip_address)
     arp_request.OPER  = OPER_REQUEST;
     ethernet_mac_copy(arp_request.SHA, our_mac_address);
     ethernet_mac_copy(arp_request.THA, broadcast_addr);
-    arp_request.SPA = OUR_IP_ADDRESS;
+    arp_request.SPA = interface->ipv4_data.addr;
     arp_request.TPA = ip_address;
 
     memset(&arp_p_req, 0, sizeof(arp_p_req));
@@ -147,7 +147,7 @@ static void arp_rx_packet(struct packet_t *pkt)
 
         memset(&resp, 0, sizeof(resp));
 
-        if (packet->TPA != OUR_IP_ADDRESS)
+        if (packet->TPA != interface->ipv4_data.addr)
             return;
 
         resp.HTYPE = HTYPE_ETHERNET;
@@ -157,7 +157,7 @@ static void arp_rx_packet(struct packet_t *pkt)
         resp.OPER  = OPER_REPLY;
         ethernet_mac_copy(resp.SHA, our_mac_address);
         ethernet_mac_copy(resp.THA, packet->SHA);
-        resp.SPA = OUR_IP_ADDRESS;
+        resp.SPA = interface->ipv4_data.addr;
         resp.TPA = packet->SPA;
 
         arp_swap_endian(&resp);
