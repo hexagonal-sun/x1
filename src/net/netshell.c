@@ -100,6 +100,38 @@ static void net_shell_netinf_list(int argc, char *argv[])
     netinf_for_each_interface(print_interface_stats);
 }
 
+static void net_shell_netinf_set_ip(int argc, char *argv[])
+{
+    if (argc != 4) {
+        printf("Error: expected three arguments: INTERFACE IPADDRESS NETMASK\n");
+        return;
+    }
+
+    struct netinf *interface = netinf_get_for_name(argv[1]);
+
+    if (!interface) {
+        printf("Error: interface \"%s\" not found.\n", argv[1]);
+        return;
+    }
+
+    uint32_t address, netmask;
+
+    if (read_ipv4_address(&address, argv[2]) != 0) {
+        printf("Error: IP address \"%s\" has incorrect formatting",
+               argv[2]);
+        return;
+    }
+
+    if (read_ipv4_address(&netmask, argv[3]) != 0) {
+        printf("Error: Netmask \"%s\" has incorrect formatting",
+               argv[2]);
+        return;
+    }
+
+    interface->ipv4_data.addr = address;
+    interface->ipv4_data.netmask = netmask;
+}
+
 static void net_shell_stats(int argc, char *argv[])
 {
     (void)argc;
@@ -118,6 +150,9 @@ static struct shell_cmd net_shell_cmds[] = {
     SHELL_CMD_INITIALIZER("netinf_list", net_shell_netinf_list,
                           "netinf_list",
                           "Print a list of registered network interfaces"),
+    SHELL_CMD_INITIALIZER("netinf_set_ip", net_shell_netinf_set_ip,
+                          "netinf_set_ip INTERFACENAME IPADDRESS NETMASK",
+                          "Set the IP address of a particular interface manually."),
 };
 
 void net_shell_init(void)
