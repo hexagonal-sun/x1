@@ -22,6 +22,28 @@ static void print_ipv4_address(uint32_t address)
     }
 }
 
+static int read_ipv4_address(uint32_t *address,
+                             const char *buffer)
+{
+    uint8_t octets[4];
+
+    if (sscanf(buffer,"%hhu.%hhu.%hhu.%hhu",
+               &octets[0],
+               &octets[1],
+               &octets[2],
+               &octets[3]) != 4)
+        return -EINVAL;
+
+    *address = 0;
+
+    for (size_t i = 0; i < 4; i++)
+        *address |= octets[i] << (i * 8);
+
+    swap_endian32(address);
+
+    return 0;
+}
+
 static void net_shell_resolve(int argc, char *argv[])
 {
     uint32_t addr;
