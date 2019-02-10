@@ -162,6 +162,23 @@ out:
     return ret;
 }
 
+struct netinf *netinf_get_for_name(const char *name)
+{
+    struct netinf *interface, *ret = NULL;
+
+    mutex_lock(&interface_list_mutex);
+
+    for_each_interface(interface) {
+        if (strcmp(name, interface->name) == 0) {
+            ret = interface;
+            break;
+        }
+    }
+
+    mutex_unlock(&interface_list_mutex);
+    return ret;
+}
+
 void netinf_for_each_interface(netinf_iter_callback_t callback)
 {
     struct netinf *i;

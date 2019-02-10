@@ -52,6 +52,7 @@ struct netinf *netinf_create(const char *name,
                              enum protocol_type rx_frame_protocol);
 
 struct netinf *netinf_get_for_ipv4_addr(uint32_t dst_addr);
+struct netinf *netinf_get_for_name(const char *name);
 
 typedef void (*netinf_iter_callback_t)(struct netinf *);
 void netinf_for_each_interface(netinf_iter_callback_t callback);
