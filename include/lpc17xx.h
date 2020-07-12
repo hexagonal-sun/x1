@@ -2,6 +2,108 @@
 
 typedef struct
 {
+    uint32_t HcRevision;
+    uint32_t HcControl;
+    uint32_t HcCommandStatus;
+    uint32_t HcInterruptStatus;
+    uint32_t HcInterruptEnable;
+    uint32_t HcInterruptDisable;
+    uint32_t HcHCCA;
+    uint32_t HcPeriodCurrentED;
+    uint32_t HcControlHeadED;
+    uint32_t HcControlCurrentED;
+    uint32_t HcBulkHeadED;
+    uint32_t HcBulkCurrentED;
+    uint32_t HcDoneHead;
+    uint32_t HcFmInterval;
+    uint32_t HcFmRemaining;
+    uint32_t HcFmNumber;
+    uint32_t HcPeriodicStart;
+    uint32_t HcLSTreshold;
+    uint32_t HcRhDescriptorA;
+    uint32_t HcRhDescriptorB;
+    uint32_t HcRhStatus;
+    uint32_t HcRhPortStatus1;
+    uint32_t HcRhPortStatus2;
+    uint32_t __reserved_0[40];
+    uint32_t Module_ID;
+    uint32_t OTGIntSt;
+    uint32_t OTGIntEn;
+    uint32_t OTGIntSet;
+    uint32_t OTGIntClr;
+    uint32_t OTGStCtrl;
+    uint32_t OTGTmr;
+    uint32_t __reserved_1[58];
+
+    uint32_t USBDevIntSt;
+    uint32_t USBDevIntEn;
+    uint32_t USBDevIntClr;
+    uint32_t USBDevIntSet;
+
+    uint32_t USBCmdCode;
+    uint32_t USBCmdData;
+
+    uint32_t USBRxData;
+    uint32_t USBTxData;
+    uint32_t USBRxPLen;
+    uint32_t USBTxPLen;
+    uint32_t USBCtrl;
+    uint32_t USBDevIntPri;
+
+    uint32_t USBEpIntSt;
+    uint32_t USBEpIntEn;
+    uint32_t USBEpIntClr;
+    uint32_t USBEpIntSet;
+    uint32_t USBEpIntPri;
+
+    uint32_t USBReEp;
+    uint32_t USBEpInd;
+    uint32_t USBMaxPSize;
+
+    uint32_t USBDMARSt;
+    uint32_t USBDMARClr;
+    uint32_t USBDMARSet;
+    uint32_t __reserved_2[9];
+    uint32_t USBUDCAH;
+    uint32_t USBEpDMASt;
+    uint32_t USBEpDMAEn;
+    uint32_t USBEpDMADis;
+    uint32_t USBDMAIntSt;
+    uint32_t USBDMAIntEn;
+    uint32_t __reserved_3[2];
+    uint32_t USBEoTIntSt;
+    uint32_t USBEoTIntClr;
+    uint32_t USBEoTIntSet;
+    uint32_t USBNDDRIntSt;
+    uint32_t USBNDDRIntClr;
+    uint32_t USBNDDRIntSet;
+    uint32_t USBSysErrIntSt;
+    uint32_t USBSysErrIntClr;
+    uint32_t USBSysErrIntSet;
+    uint32_t __reserved_4[15];
+
+    union {
+        uint32_t I2C_RX;
+        uint32_t I2C_TX;
+    };
+    uint32_t I2C_STS;
+    uint32_t I2C_CTL;
+    uint32_t I2C_CLKHI;
+    uint32_t I2C_CLKLO;
+    uint32_t __reserved_5[824];
+
+    union {
+        uint32_t USBClkCtrl;
+        uint32_t OTGClkCtrl;
+    };
+    union {
+        uint32_t USBClkSt;
+        uint32_t OTGClkSt;
+    };
+} lpc_periph_usb_t;
+
+typedef struct
+{
     uint32_t MAC1;
     uint32_t MAC2;
     uint32_t IPGT;
@@ -262,6 +364,7 @@ typedef struct
 #define SCR_SLEEPONEXIT_MASK (1 << 1)
 
 static volatile lpc_periph_emac_t   * const LPC_EMAC   = (lpc_periph_emac_t *)0x50000000;
+static volatile lpc_periph_usb_t    * const LPC_USB    = (lpc_periph_usb_t *) 0x5000C000;
 static volatile lpc_periph_sc_t     * const LPC_SC     = (lpc_periph_sc_t *)0x400FC000;
 static volatile lpc_periph_pincon_t * const LPC_PINCON = (lpc_periph_pincon_t *)0x4002C000;
 static volatile lpc_periph_timer_t  * const LPC_TIM0   = (lpc_periph_timer_t *)0x40004000;
